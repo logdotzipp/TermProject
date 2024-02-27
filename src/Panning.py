@@ -37,12 +37,12 @@ def motor_control(shares):
             coder = Encoder(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8, 1, 2)
             
             # Flywheel control pin
-            Eme = pyb.Pin(pyb.Pin.board.PB8, pyb.Pin.OUT_PP)
+            Eme = pyb.Pin(pyb.Pin.board.PA8, pyb.Pin.OUT_PP)
             
             # Flywheel Timer & Channel
-            tim4 = pyb.Timer(4, freq = 20000)
-            ch3 = tim4.channel(3, pyb.Timer.PWM, pin=Eme)
-            ch3.pulse_width_percent(0)
+            tim1 = pyb.Timer(1, freq = 20000)
+            ch1 = tim1.channel(1, pyb.Timer.PWM, pin=Eme)
+            ch1.pulse_width_percent(0)
             
             statemc = 1
             
@@ -74,7 +74,7 @@ def motor_control(shares):
         elif(statemc == 2):
                 
             # Run motor controller step response
-            ch3.pulse_width_percent(80)   
+            ch1.pulse_width_percent(80)   
             # read encoder
             currentPos = coder.read()
             
@@ -132,7 +132,7 @@ def motor_control(shares):
                                 # SS achieved, exit all loops
                                 statemc = 1
                                 motor1.set_duty_cycle(0)
-                                ch3.pulse_width_percent(0)
+                                ch1.pulse_width_percent(0)
                                 
                         else:
                             # SS not achieved, keep controlling that motor
