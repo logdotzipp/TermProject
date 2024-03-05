@@ -11,10 +11,12 @@ import gc
 import pyb
 import cotask
 import task_share
-import utime
+import utime as time
 from Encoder import Encoder
 from motor_driver import MotorDriver
 from controller import PController
+from mlx_cam import MLX_Cam
+from machine import Pin, I2C
 
 
 def motor_control(shares):
@@ -25,7 +27,7 @@ def motor_control(shares):
     """
 
     statemc = 0
-    doShoot = shares
+    doShoot, pixelpos = shares
     doShoot.put(0)
     while True:
         if (statemc == 0):
@@ -50,7 +52,9 @@ def motor_control(shares):
             if triggerswitch.value() == 0:
                 
                 # Setup proportional controller for 180 degrees of rotation
-                cntrlr = PController(.16, 1200)
+                desiredpos = -(pixelpos.get()-17)/0.11 + 1210
+                print("\n ****************************************************"+str(desiredpos))
+                cntrlr = PController(.16, desiredpos)
                 
                 # Rezero the encoder
                 coder.zero()
@@ -67,7 +71,7 @@ def motor_control(shares):
                 print("Setup Complete")
                 
                 # Keep track of time with tzero
-                tzero = utime.ticks_ms()
+                tzero = time.ticks_ms()
                 
                 statemc = 2
             
@@ -80,7 +84,7 @@ def motor_control(shares):
             
             # Store values
             posVals.append(currentPos)
-            timeVals.append(utime.ticks_ms()-tzero)
+            timeVals.append(time.ticks_ms()-tzero)
             
             # Run controller to get the pwm value
             pwm = cntrlr.run(currentPos)
@@ -114,7 +118,7 @@ def motor_control(shares):
                 currentPos = coder.read()
                 # Store values
                 posVals.append(currentPos)
-                timeVals.append(utime.ticks_ms()-tzero)
+                timeVals.append(time.ticks_ms()-tzero)
                 
                 # Run controller to get the pwm value
                 pwm = cntrlr.run(currentPos)
@@ -147,7 +151,7 @@ def pusher_control(shares):
     """
     
     statepc = 0
-    doShoot = shares
+    doShoot, pixelpos = shares
     while True:
         if(statepc == 0):
             #init
@@ -182,6 +186,103 @@ def pusher_control(shares):
                 statepc = 1
 
         yield statepc
+        
+def camera(shares):
+    statecam = 0
+    doShoot, pixelpos = shares
+    while True:
+        if statecam == 0:
+            import gc
+
+            # The following import is only used to check if we have an STM32 board such
+            # as a Pyboard or Nucleo; if not, use a different library
+            try:
+                from pyb import info
+
+            # Oops, it's not an STM32; assume generic machine.I2C for ESP32 and others
+            except ImportError:
+                # For ESP32 38-pin cheapo board from NodeMCU, KeeYees, etc.
+                i2c_bus = I2C(1, scl=Pin(22), sda=Pin(21))
+
+            # OK, we do have an STM32, so just use the default pin assignments for I2C1
+            else:
+                i2c_bus = I2C(1)
+
+            print("MXL90640 Easy(ish) Driver Test")
+
+            # Select MLX90640 camera I2C address, normally 0x33, and check the bus
+            i2c_address = 0x33
+            scanhex = [f"0x{addr:X}" for addr in i2c_bus.scan()]
+            print(f"I2C Scan: {scanhex}")
+
+            # Create the camera object and set it up in default mode
+            camera = MLX_Cam(i2c_bus)
+            print(f"Current refresh rate: {camera._camera.refresh_rate}")
+            camera._camera.refresh_rate = 10.0
+            print(f"Refresh rate is now:  {camera._camera.refresh_rate}")
+            
+            statecam = 1
+            
+        elif statecam == 1:
+            # Get and image and see how long it takes to grab that image
+            print("Click.", end='')
+            begintime = time.ticks_ms()
+#             image = camera.get_image()
+
+            # Keep trying to get an image; this could be done in a task, with
+            # the task yielding repeatedly until an image is available
+            image = None
+            while not image:
+                image = camera.get_image_nonblocking()
+                time.sleep_ms(50)
+
+            print(f" {time.ticks_diff(time.ticks_ms(), begintime)} ms")
+
+            # Can show image.v_ir, image.alpha, or image.buf; image.v_ir best?
+            # Display pixellated grayscale or numbers in CSV format; the CSV
+            # could also be written to a file. Spreadsheets, Matlab(tm), or
+            # CPython can read CSV and make a decent false-color heat plot.
+            show_image = False
+            show_csv = True
+            data = []
+            if show_image:
+                camera.ascii_image(image)
+            elif show_csv:
+                maxcolumn = []
+                columntotals = []
+                coltotal = 0
+                
+                for line in camera.get_csv(image, data, limits=(0, 99)):
+                    pass
+                    #print(line)
+                #print(data)
+                    
+                for n in range(28):
+                    for i in range(5, 23):
+                        coltotal += data[n+i*32]
+                    columntotals.append(coltotal)
+                    coltotal = 0
+                #print("\n" + str(columntotals))
+                
+                ind = columntotals.index(max(columntotals))
+                pixelpos.put(ind)
+                print(ind)
+#                 shootcolumn = []
+#                 for n in range(32):
+#                     if n == ind:
+#                         shootcolumn.append(1)
+#                     else:
+#                         shootcolumn.append(0)
+#                 print("\n" + str(shootcolumn))
+                    
+                        
+                    
+            else:
+                camera.ascii_art(image)
+            gc.collect()
+            print(f"Memory: {gc.mem_free()} B free")
+        yield statecam
+            
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
 # tasks run until somebody presses ENTER, at which time the scheduler stops and
 # printouts show diagnostic information about the tasks, share, and queue.
@@ -198,15 +299,21 @@ if __name__ == "__main__":
     
     # Create a share and a queue to test function and diagnostic printouts
     share0 = task_share.Share('H', thread_protect=False, name="Share 0")
+    share1 = task_share.Share('H', thread_protect=False, name="Share 1")
 
     motor_control = cotask.Task(motor_control, name="Motor Control Task", priority=2, period=10,
-                        profile=True, trace=False, shares = (share0))
+                        profile=True, trace=False, shares = (share0, share1))
     
     pusher_control = cotask.Task(pusher_control, name="Pusher Motor Control Task", priority=1, period=10,
-                        profile=True, trace=False, shares = (share0))
+                        profile=True, trace=False, shares = (share0, share1))
+    
+    camera = cotask.Task(camera, name="Camera Task", priority=3, period=3000,
+                        profile=True, trace=False, shares = (share0, share1))
     
     cotask.task_list.append(motor_control)
     cotask.task_list.append(pusher_control)
+    cotask.task_list.append(camera)
+
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started
