@@ -27,7 +27,7 @@ def motor_control(shares):
     """
 
     statemc = 0
-    doShoot, pixelpos = shares
+    doShoot, pixelpos, camflg = shares
     doShoot.put(0)
     while True:
         if (statemc == 0):
@@ -42,19 +42,23 @@ def motor_control(shares):
             Eme = pyb.Pin(pyb.Pin.board.PA8, pyb.Pin.OUT_PP)
             
             # Flywheel Timer & Channel
-            tim1 = pyb.Timer(1, freq = 20000)
-            ch1 = tim1.channel(1, pyb.Timer.PWM, pin=Eme)
-            ch1.pulse_width_percent(0)
+            tim4 = pyb.Timer(1, freq = 20000)
+            ch3 = tim4.channel(1, pyb.Timer.PWM, pin=Eme)
+            ch3.pulse_width_percent(0)
             
             statemc = 1
             
         elif(statemc == 1):
             if triggerswitch.value() == 0:
-                
+                camflg.put(1)
+                print("Button Press")
+                statemc = 2
+        elif(statemc == 2):
+            if camflg.get() == 0:
                 # Setup proportional controller for 180 degrees of rotation
-                desiredpos = -(pixelpos.get()-17)/0.11 + 1210
+                desiredpos = -(pixelpos.get()-17)/0.11 + 1210 + 20
                 print("\n ****************************************************"+str(desiredpos))
-                cntrlr = PController(.16, desiredpos)
+                cntrlr = PController(.2, desiredpos)
                 
                 # Rezero the encoder
                 coder.zero()
@@ -73,12 +77,12 @@ def motor_control(shares):
                 # Keep track of time with tzero
                 tzero = time.ticks_ms()
                 
-                statemc = 2
+                statemc = 3
             
-        elif(statemc == 2):
+        elif(statemc == 3):
                 
             # Run motor controller step response
-            ch1.pulse_width_percent(80)   
+            ch3.pulse_width_percent(70)    
             # read encoder
             currentPos = coder.read()
             
@@ -102,7 +106,9 @@ def motor_control(shares):
                             timeVals = []
                             posVals = []
                             # SS achieved, exit all loops
-                            statemc = 3
+                            statemc = 4
+                            print("Looking at target")
+                            print(currentPos)
                             motor1.set_duty_cycle(0)
                             cntrlr.set_setpoint(0)
                             doShoot.put(1)
@@ -111,7 +117,7 @@ def motor_control(shares):
                         # SS not achieved, keep controlling that motor
                         break
                     
-        elif(statemc == 3):
+        elif(statemc == 4):
             # Run motor controller step response
             if(doShoot.get() == 0):
                 # read encoder
@@ -136,7 +142,8 @@ def motor_control(shares):
                                 # SS achieved, exit all loops
                                 statemc = 1
                                 motor1.set_duty_cycle(0)
-                                ch1.pulse_width_percent(0)
+                                ch3.pulse_width_percent(0)
+                                print("Return home")
                                 
                         else:
                             # SS not achieved, keep controlling that motor
@@ -151,7 +158,7 @@ def pusher_control(shares):
     """
     
     statepc = 0
-    doShoot, pixelpos = shares
+    doShoot, pixelpos, camflg = shares
     while True:
         if(statepc == 0):
             #init
@@ -180,7 +187,7 @@ def pusher_control(shares):
             if pusherswitch.value() == 1:
                 pusher.set_duty_cycle(50)
             else:
-                print('Click')
+                print('Pusher psh')
                 pusher.set_duty_cycle(0)
                 doShoot.put(0)
                 statepc = 1
@@ -189,7 +196,7 @@ def pusher_control(shares):
         
 def camera(shares):
     statecam = 0
-    doShoot, pixelpos = shares
+    doShoot, pixelpos, camflg = shares
     while True:
         if statecam == 0:
             import gc
@@ -224,63 +231,66 @@ def camera(shares):
             statecam = 1
             
         elif statecam == 1:
-            # Get and image and see how long it takes to grab that image
-            print("Click.", end='')
-            begintime = time.ticks_ms()
-#             image = camera.get_image()
+            if camflg.get() == 1:
+                # Get and image and see how long it takes to grab that image
+                print("Click.", end='')
+                begintime = time.ticks_ms()
+    #             image = camera.get_image()
 
-            # Keep trying to get an image; this could be done in a task, with
-            # the task yielding repeatedly until an image is available
-            image = None
-            while not image:
-                image = camera.get_image_nonblocking()
-                time.sleep_ms(50)
+                # Keep trying to get an image; this could be done in a task, with
+                # the task yielding repeatedly until an image is available
+                image = None
+                while not image:
+                    image = camera.get_image_nonblocking()
+                    time.sleep_ms(50)
 
-            print(f" {time.ticks_diff(time.ticks_ms(), begintime)} ms")
+                print(f" {time.ticks_diff(time.ticks_ms(), begintime)} ms")
 
-            # Can show image.v_ir, image.alpha, or image.buf; image.v_ir best?
-            # Display pixellated grayscale or numbers in CSV format; the CSV
-            # could also be written to a file. Spreadsheets, Matlab(tm), or
-            # CPython can read CSV and make a decent false-color heat plot.
-            show_image = False
-            show_csv = True
-            data = []
-            if show_image:
-                camera.ascii_image(image)
-            elif show_csv:
-                maxcolumn = []
-                columntotals = []
-                coltotal = 0
-                
-                for line in camera.get_csv(image, data, limits=(0, 99)):
-                    pass
-                    #print(line)
-                #print(data)
-                    
-                for n in range(28):
-                    for i in range(5, 23):
-                        coltotal += data[n+i*32]
-                    columntotals.append(coltotal)
+                # Can show image.v_ir, image.alpha, or image.buf; image.v_ir best?
+                # Display pixellated grayscale or numbers in CSV format; the CSV
+                # could also be written to a file. Spreadsheets, Matlab(tm), or
+                # CPython can read CSV and make a decent false-color heat plot.
+                show_image = False
+                show_csv = True
+                data = []
+                if show_image:
+                    camera.ascii_image(image)
+                elif show_csv:
+                    maxcolumn = []
+                    columntotals = []
                     coltotal = 0
-                #print("\n" + str(columntotals))
-                
-                ind = columntotals.index(max(columntotals))
-                pixelpos.put(ind)
-                print(ind)
-#                 shootcolumn = []
-#                 for n in range(32):
-#                     if n == ind:
-#                         shootcolumn.append(1)
-#                     else:
-#                         shootcolumn.append(0)
-#                 print("\n" + str(shootcolumn))
                     
+                    for line in camera.get_csv(image, data, limits=(0, 99)):
+                        pass
+                        #print(line)
+                    #print(data)
                         
-                    
-            else:
-                camera.ascii_art(image)
-            gc.collect()
-            print(f"Memory: {gc.mem_free()} B free")
+                    for n in range(28):
+                        for i in range(5, 23):
+                            coltotal += data[n+i*32]
+                        columntotals.append(coltotal)
+                        coltotal = 0
+                    #print("\n" + str(columntotals))
+
+                    ind = columntotals.index(max(columntotals))
+                    pixelpos.put(ind)
+                    camflg.put(0)
+                    print("Flg clr")
+                    print(ind)
+    #                 shootcolumn = []
+    #                 for n in range(32):
+    #                     if n == ind:
+    #                         shootcolumn.append(1)
+    #                     else:
+    #                         shootcolumn.append(0)
+    #                 print("\n" + str(shootcolumn))
+                        
+                            
+                        
+                else:
+                    camera.ascii_art(image)
+                gc.collect()
+                print(f"Memory: {gc.mem_free()} B free")
         yield statecam
             
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
@@ -300,15 +310,16 @@ if __name__ == "__main__":
     # Create a share and a queue to test function and diagnostic printouts
     share0 = task_share.Share('H', thread_protect=False, name="Share 0")
     share1 = task_share.Share('H', thread_protect=False, name="Share 1")
+    share2 = task_share.Share('H', thread_protect=False, name="Share 2")
 
     motor_control = cotask.Task(motor_control, name="Motor Control Task", priority=2, period=10,
-                        profile=True, trace=False, shares = (share0, share1))
+                        profile=True, trace=False, shares = (share0, share1, share2))
     
     pusher_control = cotask.Task(pusher_control, name="Pusher Motor Control Task", priority=1, period=10,
-                        profile=True, trace=False, shares = (share0, share1))
+                        profile=True, trace=False, shares = (share0, share1, share2))
     
     camera = cotask.Task(camera, name="Camera Task", priority=3, period=3000,
-                        profile=True, trace=False, shares = (share0, share1))
+                        profile=True, trace=False, shares = (share0, share1, share2))
     
     cotask.task_list.append(motor_control)
     cotask.task_list.append(pusher_control)
