@@ -33,6 +33,9 @@ def motor_control(shares):
         if (statemc == 0):
             # Setup User input switch
             triggerswitch = pyb.Pin(pyb.Pin.board.PC13, pyb.Pin.IN, pull = pyb.Pin.PULL_UP)
+            # Setup the turret home position limit switch
+            homeswitch = pyb.Pin(pyb.Pin.board.PC3, pyb.Pin.IN, pull = pyb.Pin.PULL_UP)
+            
             # Setup Motor Object
             motor1 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, pyb.Timer(5, freq=20000))
             # Setup Encoder Object
@@ -44,9 +47,19 @@ def motor_control(shares):
             # Flywheel Timer & Channel
             tim4 = pyb.Timer(1, freq = 20000)
             ch3 = tim4.channel(1, pyb.Timer.PWM, pin=Eme)
+            # Ensure flywheels are disabled
             ch3.pulse_width_percent(0)
             
-            statemc = 1
+            zeroreturnspeed = 10
+            motor1.set_duty_cycle(zeroreturnspeed)
+            
+            
+            
+            
+            
+            
+            # transfer to state 5 to home the turret
+            statemc = 5
             
         elif(statemc == 1):
             if triggerswitch.value() == 0:
@@ -110,7 +123,7 @@ def motor_control(shares):
                             print("Looking at target")
                             print(currentPos)
                             motor1.set_duty_cycle(0)
-                            cntrlr.set_setpoint(0)
+                            cntrlr.set_setpoint(300) # ~45 degrees from home
                             doShoot.put(1)
                             
                     else:
@@ -140,15 +153,25 @@ def motor_control(shares):
                         if(posVals[-i-1] == currentPos):
                             if(i == lookback):
                                 # SS achieved, exit all loops
-                                statemc = 1
-                                motor1.set_duty_cycle(0)
+                                statemc = 5
+                                motor1.set_duty_cycle(zeroreturnspeed)
                                 ch3.pulse_width_percent(0)
-                                print("Return home")
+                                print("Returning home")
                                 
                         else:
                             # SS not achieved, keep controlling that motor
                             break
-                    
+        elif statemc == 5:
+            # Homing limit switch state, motor is running, wait for switch to be pressed
+            
+            if homeswitch.value() == 0:
+                # home switch triggered, stop motor
+                print("homing complete!")
+                motor1.set_duty_cycle(0)
+                coder.zero()
+                # Done with state, await user input
+                statemc = 1
+                
         yield statemc
 
 def pusher_control(shares):
@@ -167,7 +190,6 @@ def pusher_control(shares):
             pusher.set_duty_cycle(0)
             
             # Setup Pusher Limit Switch
-            trigger = pyb.Pin(pyb.Pin.board.PC3, pyb.Pin.OUT)
             pusherswitch = pyb.Pin(pyb.Pin.board.PB3, pyb.Pin.IN, pull = pyb.Pin.PULL_UP)
             
             
@@ -318,7 +340,7 @@ if __name__ == "__main__":
     pusher_control = cotask.Task(pusher_control, name="Pusher Motor Control Task", priority=1, period=10,
                         profile=True, trace=False, shares = (share0, share1, share2))
     
-    camera = cotask.Task(camera, name="Camera Task", priority=3, period=3000,
+    camera = cotask.Task(camera, name="Camera Task", priority=3, period=250,
                         profile=True, trace=False, shares = (share0, share1, share2))
     
     cotask.task_list.append(motor_control)
