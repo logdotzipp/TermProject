@@ -69,7 +69,8 @@ def motor_control(shares):
         elif(statemc == 2):
             if camflg.get() == 0:
                 # Setup proportional controller for 180 degrees of rotation
-                desiredpos = -(pixelpos.get()-17)/0.11 + 1210 + 20
+                print(str(pixelpos.get()))
+                desiredpos = -(pixelpos.get()-17)/0.11 + 1210 + 5
                 print("\n ****************************************************"+str(desiredpos))
                 cntrlr = PController(.2, desiredpos)
                 
@@ -290,13 +291,17 @@ def camera(shares):
                     for n in range(28):
                         for i in range(5, 23):
                             coltotal += data[n+i*32]
-                        columntotals.append(coltotal)
+                        if n <= 8:
+                            columntotals.append(0)
+                        else:
+                            columntotals.append(coltotal)
                         coltotal = 0
                     #print("\n" + str(columntotals))
 
                     ind = columntotals.index(max(columntotals))
                     pixelpos.put(ind)
                     camflg.put(0)
+                    camera.ascii_art(image)
                     print("Flg clr")
                     print(ind)
     #                 shootcolumn = []
