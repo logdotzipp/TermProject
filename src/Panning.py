@@ -64,6 +64,7 @@ def motor_control(shares):
         elif(statemc == 1):
             if triggerswitch.value() == 0:
                 print("Button Press")
+                timestart = time.ticks_ms()
                 count = 0
                 statemc = 2
                 
@@ -73,6 +74,8 @@ def motor_control(shares):
             if count >= 550:
                 statemc = 3
                 camflg.put(1)
+                print(f" {time.ticks_diff(time.ticks_ms(), timestart)} ms")
+
             else:
                 statemc = 2
         elif(statemc == 3):
@@ -84,7 +87,7 @@ def motor_control(shares):
                 cntrlr = PController(.2, desiredpos)
                 
                 # Rezero the encoder
-                coder.zero()
+                #coder.zero()
                 
                 # Create list of for storing time
                 timeVals = []
@@ -101,6 +104,7 @@ def motor_control(shares):
                 tzero = time.ticks_ms()
                 
                 statemc = 4
+                print(f" setup complete at: {time.ticks_diff(time.ticks_ms(), timestart)} ms")
             
         elif(statemc == 4):
                 
@@ -135,6 +139,8 @@ def motor_control(shares):
                             motor1.set_duty_cycle(0)
                             cntrlr.set_setpoint(300) # ~45 degrees from home
                             doShoot.put(1)
+                            print(f" set doshoot at: {time.ticks_diff(time.ticks_ms(), timestart)} ms")
+
                             
                     else:
                         # SS not achieved, keep controlling that motor
@@ -353,7 +359,7 @@ if __name__ == "__main__":
     pusher_control = cotask.Task(pusher_control, name="Pusher Motor Control Task", priority=1, period=10,
                         profile=True, trace=False, shares = (share0, share1, share2))
     
-    camera = cotask.Task(camera, name="Camera Task", priority=3, period=250,
+    camera = cotask.Task(camera, name="Camera Task", priority=3, period=20,
                         profile=True, trace=False, shares = (share0, share1, share2))
     
     cotask.task_list.append(motor_control)
