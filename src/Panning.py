@@ -52,64 +52,64 @@ def motor_control(shares):
             
             zeroreturnspeed = 10
             motor1.set_duty_cycle(zeroreturnspeed)
-        
+            
+            
+            
+            
+            
             
             # transfer to state 6 to home the turret
             statemc = 6
             
         elif(statemc == 1):
             if triggerswitch.value() == 0:
-                
                 print("Button Press")
-                camflg.put(1)
+                timestart = time.ticks_ms()
                 count = 0
-                ch3.pulse_width_percent(70)
-                statemc = 3
+                statemc = 2
                 
         elif(statemc == 2):
             # Stay in this state for 500 cycles to wait 5 seconds
             count+=1
-            desiredpos = -(pixelpos.get()-17)/0.11 + 1210 + 5
-            cntrlr.set_setpoint(desiredpos)
-            currentPos = coder.read()
-            pwm = cntrlr.run(currentPos)
-            motor1.set_duty_cycle(-pwm)
             if count >= 550:
-                statemc = 4
-                camflg.put(0)
+                statemc = 3
+                camflg.put(1)
+                print(f" {time.ticks_diff(time.ticks_ms(), timestart)} ms")
+
             else:
                 statemc = 2
         elif(statemc == 3):
-            #if camflg.get() == 0:
-            # Setup proportional controller for 180 degrees of rotation
-            print(str(pixelpos.get()))
-            desiredpos = -(pixelpos.get()-17)/0.11 + 1210 + 5
-            print("\n ****************************************************"+str(desiredpos))
-            cntrlr = PController(.14, desiredpos)
-            
-            # Rezero the encoder
-            coder.zero()
-            
-            # Create list of for storing time
-            timeVals = []
-            
-            # Create a list of position values
-            posVals = []
-            
-            # Define time period of steady state (lookback*10ms = steady state time)
-            lookback = 50
-            
-            print("Setup Complete")
-            
-            # Keep track of time with tzero
-            tzero = time.ticks_ms()
-            
-            statemc = 2
+            if camflg.get() == 0:
+                # Setup proportional controller for 180 degrees of rotation
+                print(str(pixelpos.get()))
+                desiredpos = -(pixelpos.get()-17)/0.11 + 1210 + 5
+                print("\n ****************************************************"+str(desiredpos))
+                cntrlr = PController(.2, desiredpos)
+                
+                # Rezero the encoder
+                #coder.zero()
+                
+                # Create list of for storing time
+                timeVals = []
+                
+                # Create a list of position values
+                posVals = []
+                
+                # Define time period of steady state (lookback*10ms = steady state time)
+                lookback = 50
+                
+                print("Setup Complete")
+                
+                # Keep track of time with tzero
+                tzero = time.ticks_ms()
+                
+                statemc = 4
+                print(f" setup complete at: {time.ticks_diff(time.ticks_ms(), timestart)} ms")
             
         elif(statemc == 4):
                 
             # Run motor controller step response
-            #ch3.pulse_width_percent(70)    
+            ch3.pulse_width_percent(70)    
             # read encoder
             currentPos = coder.read()
             
@@ -139,6 +139,8 @@ def motor_control(shares):
                             motor1.set_duty_cycle(0)
                             cntrlr.set_setpoint(300) # ~45 degrees from home
                             doShoot.put(1)
+                            print(f" set doshoot at: {time.ticks_diff(time.ticks_ms(), timestart)} ms")
+
                             
                     else:
                         # SS not achieved, keep controlling that motor
@@ -276,13 +278,9 @@ def camera(shares):
                 # Keep trying to get an image; this could be done in a task, with
                 # the task yielding repeatedly until an image is available
                 image = None
-                i = 0
                 while not image:
                     image = camera.get_image_nonblocking()
-                    i +=1
-                    print(i)
-                    #time.sleep_ms(50)
-                    yield 
+                    time.sleep_ms(50)
 
                 print(f" {time.ticks_diff(time.ticks_ms(), begintime)} ms")
 
@@ -317,8 +315,8 @@ def camera(shares):
 
                     ind = columntotals.index(max(columntotals))
                     pixelpos.put(ind)
-                    #camflg.put(0)
-                    #print("Flg clr")
+                    camflg.put(0)
+                    print("Flg clr")
                     print(ind)
     #                 shootcolumn = []
     #                 for n in range(32):
@@ -361,7 +359,7 @@ if __name__ == "__main__":
     pusher_control = cotask.Task(pusher_control, name="Pusher Motor Control Task", priority=1, period=10,
                         profile=True, trace=False, shares = (share0, share1, share2))
     
-    camera = cotask.Task(camera, name="Camera Task", priority=0, period=20,
+    camera = cotask.Task(camera, name="Camera Task", priority=3, period=20,
                         profile=True, trace=False, shares = (share0, share1, share2))
     
     cotask.task_list.append(motor_control)
@@ -385,3 +383,5 @@ if __name__ == "__main__":
     print(task_share.show_all())
     print(motor_control.get_trace())
     print('')
+
+
