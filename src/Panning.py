@@ -58,15 +58,24 @@ def motor_control(shares):
             
             
             
-            # transfer to state 5 to home the turret
-            statemc = 5
+            # transfer to state 6 to home the turret
+            statemc = 6
             
         elif(statemc == 1):
             if triggerswitch.value() == 0:
-                camflg.put(1)
                 print("Button Press")
+                count = 0
                 statemc = 2
+                
         elif(statemc == 2):
+            # Stay in this state for 500 cycles to wait 5 seconds
+            count+=1
+            if count >= 550:
+                statemc = 3
+                camflg.put(1)
+            else:
+                statemc = 2
+        elif(statemc == 3):
             if camflg.get() == 0:
                 # Setup proportional controller for 180 degrees of rotation
                 print(str(pixelpos.get()))
@@ -91,9 +100,9 @@ def motor_control(shares):
                 # Keep track of time with tzero
                 tzero = time.ticks_ms()
                 
-                statemc = 3
+                statemc = 4
             
-        elif(statemc == 3):
+        elif(statemc == 4):
                 
             # Run motor controller step response
             ch3.pulse_width_percent(70)    
@@ -120,7 +129,7 @@ def motor_control(shares):
                             timeVals = []
                             posVals = []
                             # SS achieved, exit all loops
-                            statemc = 4
+                            statemc = 5
                             print("Looking at target")
                             print(currentPos)
                             motor1.set_duty_cycle(0)
@@ -131,7 +140,7 @@ def motor_control(shares):
                         # SS not achieved, keep controlling that motor
                         break
                     
-        elif(statemc == 4):
+        elif(statemc == 5):
             # Run motor controller step response
             if(doShoot.get() == 0):
                 # read encoder
@@ -154,7 +163,7 @@ def motor_control(shares):
                         if(posVals[-i-1] == currentPos):
                             if(i == lookback):
                                 # SS achieved, exit all loops
-                                statemc = 5
+                                statemc = 6
                                 motor1.set_duty_cycle(zeroreturnspeed)
                                 ch3.pulse_width_percent(0)
                                 print("Returning home")
@@ -162,7 +171,7 @@ def motor_control(shares):
                         else:
                             # SS not achieved, keep controlling that motor
                             break
-        elif statemc == 5:
+        elif statemc == 6:
             # Homing limit switch state, motor is running, wait for switch to be pressed
             
             if homeswitch.value() == 0:
@@ -301,7 +310,6 @@ def camera(shares):
                     ind = columntotals.index(max(columntotals))
                     pixelpos.put(ind)
                     camflg.put(0)
-                    camera.ascii_art(image)
                     print("Flg clr")
                     print(ind)
     #                 shootcolumn = []
