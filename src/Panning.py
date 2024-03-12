@@ -82,7 +82,7 @@ def motor_control(shares):
             if camflg.get() == 0:
                 # Setup proportional controller for 180 degrees of rotation
                 print(str(pixelpos.get()))
-                desiredpos = -(pixelpos.get()-17)/0.11 + 1210 + 5
+                desiredpos = -(pixelpos.get()-17)/0.11 + 1210 - 7
                 print("\n ****************************************************"+str(desiredpos))
                 cntrlr = PController(.2, desiredpos)
                 
@@ -297,7 +297,6 @@ def camera(shares):
                     maxcolumn = []
                     columntotals = []
                     coltotal = 0
-                    
                     for line in camera.get_csv(image, data, limits=(0, 99)):
                         pass
                         #print(line)
@@ -312,6 +311,7 @@ def camera(shares):
                             columntotals.append(coltotal)
                         coltotal = 0
                     #print("\n" + str(columntotals))
+                    #camera.ascii_art(image)
 
                     ind = columntotals.index(max(columntotals))
                     pixelpos.put(ind)
