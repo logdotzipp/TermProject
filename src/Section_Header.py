@@ -24,10 +24,11 @@ encoder pins and timers, read current encoder position, and set the current enco
 zero.
 
 \subsection subsection4 mlx_cam
-This a thermal imaging class that uses a MLX90640 Thermal Imaging Camera from Adafruit to take
-a 32x24 sized thermal picture and return them as either a CSV file or an ASCII art. This software
-was implemented to determine the horizontal position of the opponent that is 20 ft. from the turrent's
-position.
+Written by Dr. Ridgely, this a thermal imaging class that uses a MLX90640 Thermal Imaging Camera from
+Adafruit to take a 32x24 sized thermal picture and return it as either a CSV file or ASCII art.
+The get_csv function has been modified to store all pixel data in a list.
+This software was implemented to determine the location of an opponent that is 20 ft.
+from the turret's position.
 
 \subsection subsection5 Panning
 This script is a cooperative multitasking program which implements all four of the above classes
