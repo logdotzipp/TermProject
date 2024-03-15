@@ -14,6 +14,7 @@ Figure 1: Overall Turret System CAD Model
 Figure 2: Cross section of turret and blaster
 
 ![image](https://github.com/logdotzipp/TermProject/assets/156237159/32b3f3bb-f522-43a9-8e5d-9203a71ff7c9)
+
 Figure 3: Internal view of blaster 
 
  A STM32 Nucleo MCU is used to control the system, and a L6206 H-Bridge Motor Controller Shield is used to control the pusher motor and turret motor. An additional custom N-Channel MOSFET circuit is used to drive the flywheel motors due to their unidirectional functionality and high current draw. An [Adafruit MLX90640 Thermal Camera](https://www.adafruit.com/product/4407) is used to detect targets with a relatively high heat signature. 12V Power is wired through a large red E-Stop button to allow the user to shut off motor power in the event of rapid unscheduled dissasembly or targeting of innocent bystanders. Limit switches are also used by the pusher motor and turret platter in order to home the motors between targeting cycles.  
