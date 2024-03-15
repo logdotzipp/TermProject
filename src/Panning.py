@@ -1,9 +1,9 @@
 """!
 @file Panning.py
-    This file contains a program that runs three separate tasks that takes thermal images
+    This file contains a program that runs three separate tasks which take thermal images
     of the MLX90640 and control two motors: a positioning motor and a pusher motor. The
     program uses cotask.py and task_share.py to execute cooperative multi-tasking between
-    these two task at different periods. The file was modified from basic_task.py from the
+    these three tasks at different periods. The file was modified from basic_task.py from the
     ME405 library that was originally written by Dr. Ridgely.
 """
 
@@ -21,11 +21,11 @@ from machine import Pin, I2C
 
 def motor_control(shares):
     """!
-    Task returns spur gear housing blaster assembly to its home position using a limit switch. It
+    Task returns spur gear the housing blaster assembly to its home position using a limit switch. It
     subsequently awaits a button push on PC13 to begin the sequence of events which fires the
-    blaster at a human target. This, in order, includes a state which waits for 5 seconds, a controller
-    step response to aim at the target, a controller step response to turn away from target, and finally
-    homes the blaster assembly.
+    blaster at a human target. In order, this sequence includes a state which waits for 5 seconds,
+    a controller step response to aim at the target, a controller step response to turn away from
+    the target, and blaster assembly homing.
     """
 
     statemc = 0
@@ -189,8 +189,8 @@ def motor_control(shares):
 
 def pusher_control(shares):
     """!
-    Task that controls a pusher motor which pushes darts from a magazine into flywheels. Motor is triggered when the
-    doShoot flag is set in the motor_control lab. Motor turns off when the pusher motor limit switch is triggered so
+    Task that controls a pusher motor which pushes darts from a magazine into flywheels. Pusher motor is triggered when 
+    the doShoot flag is set in the motor_control task. Motor turns off when the pusher motor limit switch is triggered so
     that only one dart is fired. 
     """
     
@@ -234,7 +234,7 @@ def camera(shares):
     Task that uses the MLX90640 thermal camera driver classes to take an image. The get_csv function of the
     mlx_cam class has been modified to store all pixel data in a list. In state 1, this list is iterated through,
     determining which column of pixels in the thermal image has the highest total temperature. The majority of code
-    implemented in state 0 and state 1 have been implemented from the test script in the mlx_cam class.
+    implemented in this task has been implemented from the test script in the mlx_cam class written by Dr. Ridgely.
     """
     statecam = 0
     doShoot, pixelpos, camflg = shares
