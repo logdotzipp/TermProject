@@ -1,2 +1,8 @@
 # TermProject
- ME 405 Bin 9 Term Project
+ ME 405 Bin 9 Term Project - Heat Seeking Nerf Turret
+
+ This repository contains code used to create a turret capable of launching foam darts at targets with a thermal signature. This device has been purpose built to compete in the Cal Poly ME 405 Term project duel. This means that it rotates 180 degrees after 5 seconds and then shoots at targets that are located in an approximately 15 degree cone. It only shoots a single dart before reseting itself. The goal was to create a turret that is accurate, consistent, and fast in order to consitently hit targets without incurring penalties for missed shots.
+
+ ## Hardware Overview
+
+ The turret itself consists of a [Pololu 37D 70L 12V 50:1 Gearmotor](https://www.pololu.com/product/4753/resources) which drives a 50 tooth pinion gear. The pinion gear then drives the 75 tooth turret platter, for an overall gear ratio of 75:1. Upon the platter sits a custom built dart launcher which uses 2 [OOD Loki 130 3s Motors](https://outofdarts.com/products/loki-130-3s-high-rpm-neo-motor-for-nerf-blasters) with [Worker Nightingale Flywheels](https://outofdarts.com/products/nightingale-flywheel-pair?_pos=6&_sid=e8fd52227&_ss=r). These motors spin up to approximately 60,000 rpm at 12V, providing more than enough kinetic energy to launch the [Worker Half Darts](https://outofdarts.com/products/worker-short-darts-200-pack-gen3-glow-tip) across the ~20ft gap between the turret and target. The darts are fed into the flywheels from a [10 Round Magazine](https://outofdarts.com/products/worker-10-round-talon-short-dart-magazine) by a [N20 Micro Gearmotor](https://outofdarts.com/products/n20-metal-gear-motor-micro-size-300-3000rmp-multiple-options) which drives a simple crank slider mechanism. 
