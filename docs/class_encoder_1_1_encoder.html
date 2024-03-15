@@ -160,8 +160,6 @@ Public Attributes</h2></td></tr>
     <tr><td class="paramname">timer</td><td>Timer object used as a counter. </td></tr>
     <tr><td class="paramname">CHA</td><td>Timer Channel corresponding to Encoder Channel A. </td></tr>
     <tr><td class="paramname">CHB</td><td>Timer Channel corresponding to Encoder Channel B. </td></tr>
-    <tr><td class="paramname">lastCount</td><td>Stores the previous value of the encoder </td></tr>
-    <tr><td class="paramname">totalCount</td><td>Stores the current total value of the encoder </td></tr>
   </table>
   </dd>
 </dl>
@@ -185,13 +183,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Function reads the Encoder's position as a positive/negative integer. </p>
-<p>Accounts for under- and over-flow cases by comparing the most recent and current count from the Encoder. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">count</td><td>Current Encoder count. </td></tr>
-    <tr><td class="paramname">d</td><td>Difference between the current encoder reading and the previous encoder reading. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Accounts for under- and over-flow cases by comparing the most recent and current count from the Encoder. </p><dl class="section return"><dt>Returns</dt><dd>Total encoder count as an integer </dd></dl>
 
 </div>
 </div>
