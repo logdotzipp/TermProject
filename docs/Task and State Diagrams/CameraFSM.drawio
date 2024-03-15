@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net" modified="2024-03-14T23:35:19.425Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="dEW3Zi7eLvaW4BIKObPF" version="23.0.2" type="device">
+  <diagram name="Page-1" id="2omlgmmkGZ0G3t3jGRxB">
+    <mxGraphModel dx="954" dy="640" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ufByjvEqTX0y0CItklXG-3" value="ALWAYS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="ufByjvEqTX0y0CItklXG-1" target="ufByjvEqTX0y0CItklXG-2">
+          <mxGeometry x="0.2" y="-20" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ufByjvEqTX0y0CItklXG-1" value="S0&lt;br&gt;INIT" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="140" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ufByjvEqTX0y0CItklXG-2" value="S1&lt;br&gt;TAKE PICTURE" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="260" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ufByjvEqTX0y0CItklXG-4" value="ALWAYS / &lt;br&gt;camflg.put(0)" style="curved=1;endArrow=classic;html=1;rounded=0;entryX=0.917;entryY=0.225;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="ufByjvEqTX0y0CItklXG-2">
+          <mxGeometry x="0.0044" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="450" y="320" as="sourcePoint" />
+            <mxPoint x="500" y="270" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="500" y="320" />
+              <mxPoint x="540" y="310" />
+              <mxPoint x="530" y="270" />
+              <mxPoint x="470" y="270" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

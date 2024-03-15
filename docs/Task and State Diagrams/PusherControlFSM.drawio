@@ -1,0 +1,71 @@
+<mxfile host="app.diagrams.net" modified="2024-03-14T23:35:46.384Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="05jIBy3KuPVP91gpMAOW" version="23.0.2" type="device">
+  <diagram name="Page-1" id="cJssYU8ttDHUDKV-z2gP">
+    <mxGraphModel dx="954" dy="640" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-3" value="ALWAYS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="s_jVCCEOXgw1bdSabT-t-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="425" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-1" value="&lt;u&gt;S0&lt;/u&gt;&lt;br&gt;INIT" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="130" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-7" value="doShoot.get() == 1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=1;" edge="1" parent="1">
+          <mxGeometry x="0.4171" y="-10" relative="1" as="geometry">
+            <mxPoint x="485" y="271" as="sourcePoint" />
+            <mxPoint x="590" y="341" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-4" value="&lt;u&gt;S1&lt;/u&gt;&lt;br&gt;WAIT FOR SHOOT FLAG" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="230" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-5" value="doShoot.get() == 0" style="curved=1;endArrow=classic;html=1;rounded=0;entryX=0.908;entryY=0.175;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="s_jVCCEOXgw1bdSabT-t-4" target="s_jVCCEOXgw1bdSabT-t-4">
+          <mxGeometry x="-0.0851" y="-10" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="490" y="280" as="sourcePoint" />
+            <mxPoint x="540" y="230" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="530" y="260" />
+              <mxPoint x="520" y="220" />
+              <mxPoint x="490" y="230" />
+            </Array>
+            <mxPoint x="3" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="s_jVCCEOXgw1bdSabT-t-6" target="s_jVCCEOXgw1bdSabT-t-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-10" value="pusherswitch == 0" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="s_jVCCEOXgw1bdSabT-t-9">
+          <mxGeometry x="-0.32" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-6" value="&lt;u&gt;S2&lt;/u&gt;&lt;br&gt;PUSH DART" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-12" value="pusherswitch == 1 /&lt;br&gt;doShoot.put(0)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="s_jVCCEOXgw1bdSabT-t-8" target="s_jVCCEOXgw1bdSabT-t-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="330" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-8" value="&lt;u&gt;S3&lt;/u&gt;&lt;br&gt;CHECK PUSHER&lt;br&gt;LIMIT SWITCH" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="460" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s_jVCCEOXgw1bdSabT-t-11" value="pusherswitch == 1" style="curved=1;endArrow=classic;html=1;rounded=0;entryX=0.4;entryY=1;entryDx=0;entryDy=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryPerimeter=0;" edge="1" parent="1" source="s_jVCCEOXgw1bdSabT-t-8" target="s_jVCCEOXgw1bdSabT-t-8">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="460" y="550" as="sourcePoint" />
+            <mxPoint x="410" y="600" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="490" y="600" />
+              <mxPoint x="450" y="620" />
+              <mxPoint x="400" y="600" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

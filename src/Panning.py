@@ -1,10 +1,10 @@
 """!
-@file main.py
-    This file contains a program that runs two separate tasks that controls two motors:
-    a positioning motor and a pusher motor. The program uses cotask.py and task_share.py
-    to execute cooperative multi-tasking between these two task at different periods.
-    The file was modified from basic_task.py from the ME405 library that was originally
-    written by Dr. Ridgely.
+@file Panning.py
+    This file contains a program that runs three separate tasks that takes thermal images
+    of the MLX90640 and control two motors: a positioning motor and a pusher motor. The
+    program uses cotask.py and task_share.py to execute cooperative multi-tasking between
+    these two task at different periods. The file was modified from basic_task.py from the
+    ME405 library that was originally written by Dr. Ridgely.
 """
 
 import gc
@@ -21,9 +21,11 @@ from machine import Pin, I2C
 
 def motor_control(shares):
     """!
-    Task awaits a proportional gain to arrive over serial, and then drives a 12V Pololu 37Dx70L 50:1 Gear motor
-    connected to a nerf turret term project 180 degrees using a closed loop proportional controller class.
-    The response is recorded and sent back over Serial to be plotted on a PC side GUI.
+    Task returns spur gear housing blaster assembly to its home position using a limit switch. It
+    subsequently awaits a button push on PC13 to begin the sequence of events which fires the
+    blaster at a human target. This, in order, includes a state which waits for 5 seconds, a controller
+    step response to aim at the target, a controller step response to turn away from target, and finally
+    homes the blaster assembly.
     """
 
     statemc = 0
@@ -35,7 +37,6 @@ def motor_control(shares):
             triggerswitch = pyb.Pin(pyb.Pin.board.PC13, pyb.Pin.IN, pull = pyb.Pin.PULL_UP)
             # Setup the turret home position limit switch
             homeswitch = pyb.Pin(pyb.Pin.board.PC3, pyb.Pin.IN, pull = pyb.Pin.PULL_UP)
-            
             # Setup Motor Object
             motor1 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, pyb.Timer(5, freq=20000))
             # Setup Encoder Object
@@ -49,15 +50,10 @@ def motor_control(shares):
             ch3 = tim4.channel(1, pyb.Timer.PWM, pin=Eme)
             # Ensure flywheels are disabled
             ch3.pulse_width_percent(0)
-            
+
             zeroreturnspeed = 10
             motor1.set_duty_cycle(zeroreturnspeed)
-            
-            
-            
-            
-            
-            
+
             # transfer to state 6 to home the turret
             statemc = 6
             
@@ -108,9 +104,10 @@ def motor_control(shares):
             
         elif(statemc == 4):
                 
-            # Run motor controller step response
+            # Run motor controller step response to look at target
             ch3.pulse_width_percent(70)    
-            # read encoder
+            
+            # Read encoder
             currentPos = coder.read()
             
             # Store values
@@ -147,7 +144,8 @@ def motor_control(shares):
                         break
                     
         elif(statemc == 5):
-            # Run motor controller step response
+            
+            # Run motor controller step response to turn away from target begin homing
             if(doShoot.get() == 0):
                 # read encoder
                 currentPos = coder.read()
@@ -157,8 +155,7 @@ def motor_control(shares):
                 
                 # Run controller to get the pwm value
                 pwm = cntrlr.run(currentPos)
-                
-                
+                                
                 # Send signal to the motor
                 motor1.set_duty_cycle(-pwm)
                 
@@ -181,7 +178,7 @@ def motor_control(shares):
             # Homing limit switch state, motor is running, wait for switch to be pressed
             
             if homeswitch.value() == 0:
-                # home switch triggered, stop motor
+                # Home switch triggered, stop motor
                 print("homing complete!")
                 motor1.set_duty_cycle(0)
                 coder.zero()
@@ -192,8 +189,9 @@ def motor_control(shares):
 
 def pusher_control(shares):
     """!
-    Task that controls a pusher motor that pushes darts from a magazine to a flywheel. Motor is triggered when
-    the PC13 button is pressed on the STM32 MCU and stops moving after setting pin PB6 low.  
+    Task that controls a pusher motor which pushes darts from a magazine into flywheels. Motor is triggered when the
+    doShoot flag is set in the motor_control lab. Motor turns off when the pusher motor limit switch is triggered so
+    that only one dart is fired. 
     """
     
     statepc = 0
@@ -207,8 +205,7 @@ def pusher_control(shares):
             
             # Setup Pusher Limit Switch
             pusherswitch = pyb.Pin(pyb.Pin.board.PB3, pyb.Pin.IN, pull = pyb.Pin.PULL_UP)
-            
-            
+                        
             statepc = 1
             
         elif(statepc == 1):
@@ -233,10 +230,17 @@ def pusher_control(shares):
         yield statepc
         
 def camera(shares):
+    """!
+    Task that uses the MLX90640 thermal camera driver classes to take an image. The get_csv function of the
+    mlx_cam class has been modified to store all pixel data in a list. In state 1, this list is iterated through,
+    determining which column of pixels in the thermal image has the highest total temperature. The majority of code
+    implemented in state 0 and state 1 have been implemented from the test script in the mlx_cam class.
+    """
     statecam = 0
     doShoot, pixelpos, camflg = shares
     while True:
         if statecam == 0:
+            
             import gc
 
             # The following import is only used to check if we have an STM32 board such
@@ -270,10 +274,10 @@ def camera(shares):
             
         elif statecam == 1:
             if camflg.get() == 1:
-                # Get and image and see how long it takes to grab that image
+                
+                # Get an image and see how long it takes to grab that image
                 print("Click.", end='')
                 begintime = time.ticks_ms()
-    #             image = camera.get_image()
 
                 # Keep trying to get an image; this could be done in a task, with
                 # the task yielding repeatedly until an image is available
@@ -297,11 +301,12 @@ def camera(shares):
                     maxcolumn = []
                     columntotals = []
                     coltotal = 0
+                    
+                    # Create list called data which stores all pixel values in a list
                     for line in camera.get_csv(image, data, limits=(0, 99)):
                         pass
-                        #print(line)
-                    #print(data)
-                        
+                    
+                    # Iterate through data to find the column with the highest total temperature
                     for n in range(28):
                         for i in range(5, 23):
                             coltotal += data[n+i*32]
@@ -318,16 +323,7 @@ def camera(shares):
                     camflg.put(0)
                     print("Flg clr")
                     print(ind)
-    #                 shootcolumn = []
-    #                 for n in range(32):
-    #                     if n == ind:
-    #                         shootcolumn.append(1)
-    #                     else:
-    #                         shootcolumn.append(0)
-    #                 print("\n" + str(shootcolumn))
-                        
-                            
-                        
+                       
                 else:
                     camera.ascii_art(image)
                 gc.collect()
