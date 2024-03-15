@@ -105,6 +105,8 @@ def motor_control(shares):
         elif(statemc == 4):
                 
             # Run motor controller step response to look at target
+            
+            # Turn on flywheel motors
             ch3.pulse_width_percent(70)    
             
             # Read encoder
@@ -114,9 +116,8 @@ def motor_control(shares):
             posVals.append(currentPos)
             timeVals.append(time.ticks_ms()-tzero)
             
-            # Run controller to get the pwm value
+            # Run controller to get the PWM value
             pwm = cntrlr.run(currentPos)
-            
             
             # Send signal to the motor
             motor1.set_duty_cycle(-pwm)
