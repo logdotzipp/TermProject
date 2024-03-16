@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "ME 405 Term Project: Thermal Imaging Nerf Turrent", "index.html", [
+  [ "ME 405 Term Project: Thermal Imaging Nerf Turret", "index.html", [
     [ "Main Page", "index.html", "index" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],

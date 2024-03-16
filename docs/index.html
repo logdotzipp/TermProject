@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ME 405 Term Project: Thermal Imaging Nerf Turrent: Main Page</title>
+<title>ME 405 Term Project: Thermal Imaging Nerf Turret: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,9 +24,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">ME 405 Term Project: Thermal Imaging Nerf Turrent<span id="projectnumber">&#160;1.0</span>
+   <div id="projectname">ME 405 Term Project: Thermal Imaging Nerf Turret<span id="projectnumber">&#160;1.0</span>
    </div>
-   <div id="projectbrief">A library that contains software used to control and fire an automated Nerf turrent. The turrent uses a MLX90640 Thermal Imaging camera to determine opponent&#39;s position and fire.</div>
+   <div id="projectbrief">A library that contains software used to control and fire an automated Nerf turret. The turret uses a MLX90640 Thermal Imaging camera to determine opponent&#39;s position and fire.</div>
   </td>
  </tr>
  </tbody>
@@ -67,37 +67,37 @@ $(function(){initNavTree('index.html',''); initResizable(); });
 <div class="contents">
 <div class="textblock"><h1><a class="anchor" id="Software"></a>
 Software</h1>
-<p>This section details the software used in the control and design of the ME 405 term project Nerf turrent.</p>
+<p>This section details the software used in the control and design of the ME 405 term project turret.</p>
 <h2><a class="anchor" id="subsection1"></a>
 Motor Driver</h2>
-<p>The Motor Driver is a class that runs any 12 V DC motor using a L6206 H-Bridge motor driver. The software was implemented to the control the PWM and the speed at which the 12 V 60:1 gearmotor is to run when turning around to shoot any player on the other side of the turrent.</p>
+<p>The Motor Driver is a class that runs any 12 V DC motor using a L6206 H-Bridge motor driver. The software was implemented to the control the PWM and the speed at which the 12 V 50:1 gearmotor is to run when turning around to shoot any player on the other side of the turret.</p>
 <h2><a class="anchor" id="subsection2"></a>
 Controller</h2>
-<p>This a general Proportional Controller class that can be used with any generic motor. The class is able to output an error from a specified desired position with a specified gain to generate an actuation value necessary for the motor to spin to get to the desired position. The software is implemented to control how far the turrent needs to turn and face the opponent before shooting a dart.</p>
+<p>This a general Proportional Controller class that can be used with any generic motor. The class is able to output an error from a specified desired position with a specified gain to generate an actuation value necessary for the motor to spin to get to the desired position. The software is implemented to control how far the turret needs to turn and face the opponent before shooting a dart.</p>
 <h2><a class="anchor" id="subsection3"></a>
 Encoder</h2>
 <p>The encoder class implements the STM32's quadature encoder functionality to: initlialize encoder pins and timers, read current encoder position, and set the current encoder position to zero.</p>
 <h2><a class="anchor" id="subsection4"></a>
 mlx_cam</h2>
-<p>This a thermal imaging class that uses a <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> Thermal Imaging Camera from Adafruit to take a 32x24 sized thermal picture and return them as either a CSV file or an ASCII art. This software was implemented to determine the horizontal position of the opponent that is 20 ft. from the turrent's position.</p>
+<p>This is a thermal imaging class that uses a <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> Thermal Imaging Camera from Adafruit to take a 32x24 sized thermal picture and return them as either a CSV file or an ASCII art. This software was implemented to determine the horizontal position of the opponent that is 20 ft. from the turret's position.</p>
 <h2><a class="anchor" id="subsection5"></a>
 Panning</h2>
 <p>This script is a cooperative multitasking program which implements all four of the above classes to aim and fire at a target using the <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> thermal camera. See the Tasks section for more details.</p>
 <h1><a class="anchor" id="Tasks"></a>
 Tasks</h1>
 <p>This section details the cooperative multitasking program in <a class="el" href="_panning_8py.html" title="This file contains a program that runs three separate tasks which take thermal images of the MLX90640...">Panning.py</a>.</p>
-<p>The overall structure and organization for the software used to control the turrent is dictated by three various tasks: motor_control, pusher_control, and camera. The motor_control tasks is used to pan the turrent 180 degrees away from the opposing team and prepare the turrent to shoot in respect to the <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> camera's feedback. <a class="el" href="#subsection6">Task 1: motor_control</a> details the Task 1 and the states that compose it that allow the turrent to pan, aim, and return to its original position. The pusher_control task simply controls the timing of a pusher motor to push a dart available from a magazine mounted to the turrent. <a class="el" href="#subsection7">Task 2: pusher_control</a> details Task 2 and the states that compose it to push a dart from a magazine to a set of flywheels. Finally, the camera task is a task that communicates with a <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> Thermal Imaging Camera to take a picture of opponents standing opposite of the turrent and is used to determine their location. <a class="el" href="#subsection8">Task 3: camera</a> details Task 3 and the state that compose it to take a thermal image opposite of the turrent.</p>
-<p>The figure below shows the task diagram of the panning file that is used to control movement and actions of the turrent.</p>
+<p><a class="el" href="_panning_8py.html" title="This file contains a program that runs three separate tasks which take thermal images of the MLX90640...">Panning.py</a> consists of three tasks: motor_control, pusher_control, and camera. The motor_control task is used to pan the turret 180 degrees away from the opposing turret and prepare to shoot at a location specified by the <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> camera's feedback. <a class="el" href="#subsection6">Task 1: motor_control</a> details Task 1 and the states that compose it, which allow the turret to pan, aim, and return to its home position. The pusher_control task simply controls the timing of a pusher motor to fire a dart. <a class="el" href="#subsection7">Task 2: pusher_control</a> details Task 2 and the states that compose it, which push a dart from a magazine through a set of flywheels. Finally, the camera task communicates with an <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> Thermal Imaging Camera to take a picture of opponents standing opposite of the turret and is used to determine their location. <a class="el" href="#subsection8">Task 3: camera</a> details Task 3 and the states that compose it, which take a thermal image opposite of the turret.</p>
+<p>The figure below shows the task diagram of the <a class="el" href="_panning_8py.html" title="This file contains a program that runs three separate tasks which take thermal images of the MLX90640...">Panning.py</a> file that is used to control movement and actions of the turret.</p>
 <div class="image">
 <img src="PanningTaskDiagram.png" alt="" width="500"/>
 <div class="caption">
 Figure 1. Task Diagram for panning.py that controls both movement and ability to fire.</div></div>
 <h2><a class="anchor" id="subsection6"></a>
 Task 1: motor_control</h2>
-<p>Task 1 controls the gear motor used to aim the blaster and controls the flywheels used to fire a dart. Additionally, it homes the blaster assembly to face 180 degrees away from the opposing team's turrent.</p>
+<p>Task 1 controls the gear motor used to aim the blaster and controls the flywheels used to fire a dart. Additionally, it homes the blaster assembly to face 180 degrees away from the opposing team's turret.</p>
 <h3><a class="anchor" id="sub1"></a>
 State 0</h3>
-<p>Initializes gear motor by creating an object of the motor_driver and encoder classes. Initializes flywheel motors by creating a timer channel object and corresponding control pin. Sets up the homing limit switch pin and the user input switch pin which begins the firing sequence. Finally, the gear motor is turned on at a slow speed to beign homing the blaster assembly. Moves on to state 6.</p>
+<p>Initializes gear motor by creating an object of the motor_driver and encoder classes. Initializes flywheel motors by creating a timer channel object and a corresponding control pin. Sets up the homing limit switch pin and the user input switch pin which begins the firing sequence. Finally, the gear motor is turned on at a slow speed to beign homing the blaster assembly. Moves on to state 6.</p>
 <h3><a class="anchor" id="sub2"></a>
 State 1</h3>
 <p>Waits for the user input switch to be pressed before moving on to state 2 to begin the firing sequence.</p>
@@ -120,7 +120,7 @@ State 6</h3>
 <div class="image">
 <img src="MotorControlFSM.png" alt="" width="500"/>
 <div class="caption">
-Figure 2. Finite State Machine diagram for Task 1: motor_control and its various state transitions.</div></div>
+Figure 2. Finite State Machine diagram for Task 1: motor_control and its state transitions.</div></div>
 <h2><a class="anchor" id="subsection7"></a>
 Task 2: pusher_control</h2>
 <p>Task 2 controls the timing of the pusher motor which pushes a dart from the magazine through the flywheels.</p>
@@ -136,11 +136,11 @@ State 2</h3>
 <h3><a class="anchor" id="sub4"></a>
 State 3</h3>
 <p>Continues moving pusher motor until the limit switch is pressed once again. Once limit switch is pressed, the pusher motor is stopped, the doShoot flag is cleared, and the task returns to state 1.</p>
-<p>Fiugre 3 shown below shows the Finite State Machien of Task 2 and its state transitions to push darts from a magazine to a flywheel.</p>
+<p>Fiugre 3 shown below shows the Finite State Machine of Task 2 and its state transitions to push darts from a magazine to a flywheel.</p>
 <div class="image">
 <img src="PusherControlFSM.png" alt="" width="500"/>
 <div class="caption">
-Figure 3. Finite State Machine diagram for Task 2: pusher_control and its various state transitions.</div></div>
+Figure 3. Finite State Machine diagram for Task 2: pusher_control and its state transitions.</div></div>
 <h2><a class="anchor" id="subsection8"></a>
 Task 3: camera</h2>
 <p>Task 3 controls the <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> thermal camera to take a single picture and returns the column in which a target is standing relative to the camera's position.</p>
@@ -149,7 +149,7 @@ State 0</h3>
 <p>Initializes I2C communication with the <a class="el" href="classsrc_1_1_m_l_x90640.html">MLX90640</a> camera. Creates an object of the MLX_Cam class to set up picture taking. Moves on to state 1.</p>
 <h3><a class="anchor" id="sub2"></a>
 State 1</h3>
-<p>Waits for the camera flag to be set by the motor_control task. Once this flag is set, state 1 captures an image in the form of a list of pixel data. This list is iterated through to determine which column the target is standing in. The column value is stored in the share called "pixelpos", and it is returned to the motor_control task. The camera flag is then cleared and the state self transitions.</p>
+<p>Waits for the camera flag to be set by the motor_control task. Once this flag is set, a thermal image is captured in the form of a list of pixel data. This list is iterated through to determine which column the target is standing in. The column value is stored in the share called "pixelpos", and it is returned to the motor_control task. The camera flag is then cleared and the state self transitions to wait for another camera flag.</p>
 <p>Figure 4 shown below shows the Finite State Machine of Task 3 and its state to take a single thermal image that will be processed for aiming.</p>
 <div class="image">
 <img src="CameraFSM.png" alt="" width="500"/>
