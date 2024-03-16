@@ -17,7 +17,10 @@ Figure 2: Cross section of turret and blaster
 
 Figure 3: Internal view of blaster 
 
- A STM32 Nucleo MCU is used to control the system, and a L6206 H-Bridge Motor Controller Shield is used to control the pusher motor and turret motor. An additional custom N-Channel MOSFET circuit is used to drive the flywheel motors due to their unidirectional functionality and high current draw. An [Adafruit MLX90640 Thermal Camera](https://www.adafruit.com/product/4407) is used to detect targets with a relatively high heat signature. 12V Power is wired through a large red E-Stop button to allow the user to shut off motor power in the event of rapid unscheduled dissasembly or targeting of innocent bystanders. Limit switches are also used by the pusher motor and turret platter in order to home the motors between targeting cycles.  
+ A STM32 Nucleo MCU is used to control the system, and a L6206 H-Bridge Motor Controller Shield is used to control the pusher motor and turret motor. An additional custom N-Channel MOSFET circuit is used to drive the flywheel motors due to their unidirectional functionality and high current draw. An [Adafruit MLX90640 Thermal Camera](https://www.adafruit.com/product/4407) is used to detect targets with a relatively high heat signature. 12V Power is wired through a large red E-Stop button to allow the user to shut off motor power in the event of rapid unscheduled dissasembly or targeting of innocent bystanders. Limit switches are also used by the pusher motor and turret platter in order to home the motors between targeting cycles.
+
+![CircuitDiagram](https://github.com/logdotzipp/TermProject/assets/156237159/24970e76-a890-42c0-b983-7fcab4da4670)
+
 
 ## Software Implementation
 The software for this project is constructed in a cotasking setup whereing tasks are assigned to each mechanism, and said tasks are given a priority and frequency at which to run. Each task contains a finite state machine in order to control the functionality of each mechanism.
